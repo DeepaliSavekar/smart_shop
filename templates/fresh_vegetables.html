@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fresh Vegetables Offer</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4fff4;
+      }
+
+      /* Banner */
+      .banner {
+        background: linear-gradient(135deg, #4caf50, #8bc34a);
+        text-align: center;
+        padding: 45px 20px;
+        color: white;
+      }
+
+      .banner h1 {
+        margin: 0;
+        font-size: 44px;
+        font-weight: 800;
+      }
+
+      .banner p {
+        margin-top: 10px;
+        font-size: 20px;
+      }
+
+      /* Products Grid */
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 30px;
+        max-width: 1100px;
+        margin: auto;
+      }
+
+      .product {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: 0.3s;
+      }
+
+      .product:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+      }
+
+      .product img {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+      }
+
+      .product-info {
+        padding: 15px;
+        text-align: center;
+      }
+
+      .product-info h3 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: bold;
+      }
+
+      .price {
+        margin-top: 8px;
+        font-size: 17px;
+        color: #4caf50;
+        font-weight: bold;
+      }
+
+      .btn {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 8px 18px;
+        background: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: 0.3s;
+      }
+
+      .btn:hover {
+        background: #3d8c43;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Banner -->
+    <div class="banner">
+      <h1>Flat 20% Off</h1>
+      <p>On fresh vegetables</p>
+    </div>
+
+    <!-- Products -->
+    <div class="products">
+      <!-- Product 1 -->
+      <div class="product">
+        <img src="/static/images/Tomatoes.jpg" alt="Tomatoes" />
+        <div class="product-info">
+          <h3>Fresh Tomatoes</h3>
+          <p class="price">₹40 / kg</p>
+          <a href="#" class="btn">Buy Now</a>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product">
+        <img src="/static/images/Carrots.jpg" alt="Carrots" />
+        <div class="product-info">
+          <h3>Organic Carrots</h3>
+          <p class="price">₹60 / kg</p>
+          <a href="#" class="btn">Buy Now</a>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product">
+        <img src="/static/images/Potatoes.jpg" alt="Potatoes" />
+        <div class="product-info">
+          <h3>Homegrown Potatoes</h3>
+          <p class="price">₹40 / kg</p>
+          <a href="#" class="btn">Buy Now</a>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product">
+        <img src="/static/images/Spinach.jpg" alt="Spinach" />
+        <div class="product-info">
+          <h3>Fresh Spinach</h3>
+          <p class="price">₹25 / bunch</p>
+          <a href="#" class="btn">Buy Now</a>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product">
+        <img src="/static/images/GreenCucumbers.jpg" alt="Cucumbers" />
+        <div class="product-info">
+          <h3>Green Cucumbers</h3>
+          <p class="price">₹50 / kg</p>
+          <a href="#" class="btn">Buy Now</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baby Care | My Shop</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f9f9f9;
+        color: #333;
+      }
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      header a:hover {
+        text-decoration: underline;
+      }
+      main {
+        padding: 40px;
+      }
+      h1 {
+        color: #007f4e;
+        margin-bottom: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+      }
+      .product-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+      }
+      .product-card h3 {
+        margin: 15px 0 10px;
+        color: #007f4e;
+      }
+      .product-card p {
+        margin-bottom: 10px;
+      }
+      button {
+        background: #007f4e;
+        color: white;
+        border: none;
+        padding: 7px 15px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #005f3b;
+      }
+      footer {
+        text-align: center;
+        background: #007f4e;
+        color: white;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('cart') }}">Cart</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Baby Care</h1>
+      <div class="product-grid" id="product-grid"></div>
+    </main>
+
+    <script>
+      const products = [
+        {
+          name: "Pampers Diapers (Pack of 40)",
+          price: 650,
+          img: "/static/images/diapers.png",
+        },
+        {
+          name: "Baby Lotion (Himalaya, 200ml)",
+          price: 180,
+          img: "/static/images/babylotion.jpg",
+        },
+        {
+          name: "Baby Shampoo (Johnson’s, 100ml)",
+          price: 120,
+          img: "/static/images/babyshampoo.jpg",
+        },
+        {
+          name: "Baby Soap (Dove, 4 pcs)",
+          price: 150,
+          img: "/static/images/babysoap.jpg",
+        },
+        {
+          name: "Baby Powder (Johnson’s, 200g)",
+          price: 160,
+          img: "/static/images/babypowder.jpg",
+        },
+        {
+          name: "Baby Oil (Johnson’s, 200ml)",
+          price: 140,
+          img: "/static/images/babyoil.jpg",
+        },
+        {
+          name: "Feeding Bottle (Philips Avent, 250ml)",
+          price: 499,
+          img: "/static/images/feeding-bottle.jpg",
+        },
+        {
+          name: "Baby Toothbrush (Pigeon Soft Grip)",
+          price: 120,
+          img: "/static/images/brush.jpg",
+        },
+        {
+          name: "Baby Cream (Himalaya, 50g)",
+          price: 90,
+          img: "/static/images/babycream.jpg",
+        },
+        {
+          name: "Baby Cloth Set",
+          price: 400,
+          img: "/static/images/babycloth.jpg",
+        },
+      ];
+
+      const grid = document.getElementById("product-grid");
+
+      products.forEach((p) => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+
+        card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Price: ₹${p.price}</p>
+      <button onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
+    `;
+
+        grid.appendChild(card);
+      });
+
+      function addToCart(name, price, img) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const existing = cart.find((item) => item.name === name);
+
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ name, price, img, quantity: 1 });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(name + " added to cart!");
+      }
+    </script>
+  </body>
+</html>

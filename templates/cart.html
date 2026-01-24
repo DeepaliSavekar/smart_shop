@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Cart | My Shop</title>
+
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #f9f9f9;
+        color: #333;
+        padding: 20px;
+      }
+
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+
+      header a,
+      header button {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      h1 {
+        color: #007f4e;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      table {
+        width: 100%;
+        max-width: 1000px;
+        margin: auto;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      th,
+      td {
+        text-align: center;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      th {
+        background: #007f4e;
+        color: white;
+        font-weight: 600;
+      }
+
+      img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      .qty-btn {
+        background: #007f4e;
+        color: white;
+        border: none;
+        padding: 5px 9px;
+        margin: 0 5px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+
+      button.remove-btn {
+        background: #e74c3c;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .total {
+        max-width: 1000px;
+        margin: 20px auto;
+        text-align: right;
+        font-size: 22px;
+        font-weight: 700;
+        color: #007f4e;
+      }
+
+      .checkout-btn {
+        display: block;
+        margin: auto;
+        background: #007f4e;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 5px;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .form-container {
+        display: none;
+        background: white;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container input {
+        width: 100%;
+        margin: 12px 0;
+        padding: 12px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      .form-container button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 5px;
+        border: none;
+        background: #007f4e;
+        color: white;
+        font-size: 17px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">My Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+
+          <li>
+            <button onclick="window.location.href='cart.html'">🛒 Cart</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <h1>Your Shopping Cart</h1>
+
+    <table id="cart-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="total" id="total">Grand Total: ₹0</div>
+
+    <button class="checkout-btn" onclick="showCheckoutForm()">
+      Proceed to Checkout
+    </button>
+
+    <div class="form-container" id="checkoutForm">
+      <h2 style="text-align: center; color: #007f4e">Checkout Form</h2>
+
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Ema il Address" required />
+      <input type="tel" id="phone" placeholder="Phone Number" required />
+
+      <button onclick="checkout()">Confirm Order</button>
+    </div>
+
+    <script>
+      function loadCart() {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        const tbody = document.querySelector("#cart-table tbody");
+        const totalDiv = document.getElementById("total");
+
+        tbody.innerHTML = "";
+        let grandTotal = 0;
+
+        if (cart.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="padding:30px;">Your cart is empty.</td></tr>`;
+          totalDiv.textContent = "Grand Total: ₹0";
+          return;
+        }
+
+        cart.forEach((item, index) => {
+          const total = item.price * item.quantity;
+          grandTotal += total;
+
+          const row = `
+        <tr>
+            <td><img src="${item.img}"></td>
+            <td>${item.name}</td>
+            <td>₹${item.price}</td>
+            <td>
+                <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+                ${item.quantity}
+                <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+            </td>
+            <td>₹${total}</td>
+            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+        </tr>`;
+
+          tbody.innerHTML += row;
+        });
+
+        totalDiv.textContent = "Grand Total: ₹" + grandTotal;
+      }
+
+      function changeQty(index, change) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        cart[index].quantity += change;
+
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+      }
+
+      function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        cart.splice(index, 1);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+      }
+
+      function showCheckoutForm() {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        if (cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+        document.getElementById("checkoutForm").style.display = "block";
+      }
+
+      function checkout() {
+        const email = document.getElementById("email").value.trim();
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+
+        // Email validation regex
+
+        const nameRegex = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
+        if (!nameRegex.test(name)) {
+          alert("❌ Enter a valid Full Name (No digits, No extra spaces)");
+          return false;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+        if (!emailRegex.test(email)) {
+          alert("❌ Enter a valid email!");
+          return false;
+        }
+
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+          alert(
+            "❌ Enter a valid 10-digit Phone Number starting with 6, 7, 8, or 9"
+          );
+          return false;
+        }
+
+        alert("Order Placed Successfully! ");
+      }
+
+      loadCart();
+    </script>
+  </body>
+</html>

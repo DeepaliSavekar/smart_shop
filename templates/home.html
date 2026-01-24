@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyGrocery | Home</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        background-color: #fff;
+      }
+
+      /* HEADER */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #1b5e20;
+        padding: 15px 30px;
+        color: #fff;
+        flex-wrap: wrap;
+      }
+
+      header .logo {
+        font-size: 1.8em;
+        font-weight: bold;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        flex-wrap: wrap;
+      }
+
+      nav ul li {
+        margin: 0 15px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+      }
+
+      nav ul li a:hover {
+        text-decoration: underline;
+      }
+
+      .search-cart {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .search-cart input[type="search"] {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+      }
+
+      .search-cart button {
+        margin-left: 10px;
+        padding: 6px 12px;
+        border: none;
+        background-color: #43a047;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* SLIDER */
+      .slider {
+        position: relative;
+        width: 100%;
+        height: 650px;
+        overflow: hidden;
+      }
+
+      .slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        width: 100%;
+      }
+
+      .slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+      }
+
+      .slide::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35));
+      }
+
+      .slide-text {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 2.4em;
+        font-weight: bold;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+        z-index: 2;
+      }
+
+      .slider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        font-size: 2em;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 50%;
+        z-index: 10;
+      }
+
+      .prev {
+        left: 20px;
+      }
+      .next {
+        right: 20px;
+      }
+
+      @media (max-width: 600px) {
+        .slider {
+          height: 280px;
+        }
+        .slide {
+          height: 280px;
+        }
+      }
+
+      /* FEATURED PRODUCTS */
+      .featured {
+        padding: 50px 20px;
+        text-align: center;
+      }
+
+      .featured h2 {
+        font-size: 2em;
+        margin-bottom: 25px;
+        color: #1b5e20;
+      }
+
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .product {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        transition: 0.3s;
+        background-color: #fafafa;
+      }
+
+      .product:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+      }
+
+      .product img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 9px;
+      }
+
+      .product h3 {
+        margin: 10px 0;
+        color: #333;
+      }
+
+      .product p {
+        font-size: 1.1em;
+        color: #2e7d32;
+      }
+
+      .product .old-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9em;
+        margin-left: 6px;
+      }
+
+      .product button {
+        margin-top: 10px;
+        padding: 8px 16px;
+        border: none;
+        background-color: #1b5e20;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* FOOTER */
+      footer {
+        background-color: #1b5e20;
+        color: white;
+        padding: 40px 20px;
+      }
+
+      .footer-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 30px;
+      }
+
+      .footer-column {
+        flex: 1 1 200px;
+      }
+
+      .footer-column h4 {
+        margin-bottom: 10px;
+      }
+
+      .footer-column ul {
+        list-style: none;
+      }
+
+      .footer-column ul li {
+        margin-bottom: 8px;
+      }
+
+      .footer-column ul li a {
+        text-decoration: none;
+        color: white;
+      }
+
+      .footer-bottom {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 0.9em;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 10px;
+      }
+
+      /* CART BOX */
+      #cart-box {
+        position: fixed;
+        top: 20%;
+        right: 5%;
+        width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        padding: 15px;
+        display: none;
+        z-index: 1000;
+      }
+
+      #close-cart {
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        float: right;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('offers') }}">Offers</a></li>
+          <li><a href="{{ url_for('stores') }}">Stores</a></li>
+          <li><a href="{{ url_for('contact') }}">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="search-cart">
+        <input type="search" placeholder="Search products..." />
+        <button id="cart-btn">🛒 Cart (0)</button>
+      </div>
+    </header>
+
+    <!-- IMAGE SLIDER -->
+    <div class="slider">
+      <div class="slides">
+        <div class="slide">
+          <img src="/static/images/slide122.jpg" alt="Fresh Groceries" />
+          <div class="slide-text">Delight In Every Bite</div>
+        </div>
+        <div class="slide">
+          <img src="/static/images/slide123.jpg" alt="Best Prices" />
+          <div class="slide-text">Clothes Reflect Personality</div>
+        </div>
+        <div class="slide">
+          <img src="/static/images/slide124.jpg" alt="Fast Delivery" />
+          <div class="slide-text">Juicy and Delicious</div>
+        </div>
+        <div class="slide">
+          <img src="/static/images/baby_cloths_img.jpg" alt="Baby Clothes" />
+          <div class="slide-text">Soft Fabrics, Smart Looks</div>
+        </div>
+        <div class="slide">
+          <img src="/static/images/sliseimg5.png" alt="Mop Set" />
+          <div class="slide-text">Simple Yet Effective Cleaning</div>
+        </div>
+      </div>
+      <button class="slider-btn prev">&#10094;</button>
+      <button class="slider-btn next">&#10095;</button>
+    </div>
+
+    <!-- FEATURED PRODUCTS -->
+    <section class="featured">
+      <h2>Featured Products</h2>
+      <div class="products">
+        <div class="product">
+          <img src="/static/images/riceeee.jpg" alt="Rice" />
+          <h3>Premium Rice</h3>
+          <p>5kg ₹480<span class="old-price">₹ 499</span></p>
+        </div>
+        <div class="product">
+          <img src="/static/images/sunfloweroil.jpg" alt="Oil" />
+          <h3>Sunflower Oil</h3>
+          <p>5Lit. ₹765 <span class="old-price">₹ 799</span></p>
+        </div>
+        <div class="product">
+          <img src="/static/images/Detergent Powder.jpg" alt="Detergent" />
+          <h3>Detergent Powder</h3>
+          <p>5Kg ₹549 <span class="old-price">₹ 589</span></p>
+        </div>
+        <div class="product">
+          <img src="/static/images/butterbiscuit.jpg" alt="Biscuits" />
+          <h3>Butter Biscuits</h3>
+          <p>270gm ₹37<span class="old-price">₹ 45</span></p>
+        </div>
+        <div class="product">
+          <img src="/static/images/pujaThali.jpg" alt="Puja Thali Set" />
+          <h3>Pure Brass Astmanghal Puja Thali Set</h3>
+          <p>₹1,710 <span class="old-price">₹ 1,799</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CART BOX -->
+    <div id="cart-box">
+      <button id="close-cart">X</button>
+      <h3>Your Cart</h3>
+      <div
+        id="cart-items"
+        style="max-height: 200px; overflow-y: auto; margin-bottom: 10px"
+      ></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-content">
+        <div class="footer-column">
+          <h4>About Us</h4>
+          <p>
+            MyGrocery is your trusted online supermarket for daily essentials.
+          </p>
+        </div>
+        <div class="footer-column">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="{{ url_for('help_centre') }}">Help Centre</a></li>
+
+            <li><a href="{{ url_for('delivery_info') }}">Delivery Info</a></li>
+            <li>
+              <a href="{{ url_for('returns_policy') }}">Returns Policy</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      /* -------- Slider JS ---------- */
+      const slides = document.querySelector(".slides");
+      const totalSlides = document.querySelectorAll(".slide").length;
+      let index = 0;
+
+      function showSlide(i) {
+        slides.style.transform = `translateX(${-i * 100}%)`;
+      }
+
+      document.querySelector(".next").addEventListener("click", () => {
+        index = (index + 1) % totalSlides;
+        showSlide(index);
+      });
+
+      document.querySelector(".prev").addEventListener("click", () => {
+        index = (index - 1 + totalSlides) % totalSlides;
+        showSlide(index);
+      });
+
+      setInterval(() => {
+        index = (index + 1) % totalSlides;
+        showSlide(index);
+      }, 4000);
+
+      /* -------- CART LOGIC ---------- */
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const cartBtn = document.getElementById("cart-btn");
+      const cartBox = document.getElementById("cart-box");
+      const cartItemsDiv = document.getElementById("cart-items");
+      const closeCart = document.getElementById("close-cart");
+
+      function updateCartCount() {
+        cartBtn.textContent = `🛒 Cart (${cart.length})`;
+      }
+
+      function addToCart(name, price) {
+        cart.push({ name, price });
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartCount();
+        alert(`${name} added to cart!`);
+      }
+
+      cartBtn.addEventListener("click", () => {
+        displayCart();
+        cartBox.style.display = "block";
+      });
+
+      closeCart.addEventListener("click", () => {
+        cartBox.style.display = "none";
+      });
+
+      function displayCart() {
+        cartItemsDiv.innerHTML = "";
+        if (cart.length === 0) {
+          cartItemsDiv.innerHTML = "<p>No items in cart</p>";
+        } else {
+          cart.forEach((item) => {
+            const div = document.createElement("div");
+            div.innerHTML = `<strong>${item.name}</strong> - ₹${item.price}`;
+            cartItemsDiv.appendChild(div);
+          });
+        }
+      }
+
+      updateCartCount();
+    </script>
+  </body>
+</html>

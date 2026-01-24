@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Shop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f9f9f9;
+        color: #333;
+      }
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      header a.active,
+      header a:hover {
+        text-decoration: underline;
+      }
+      .hero {
+        text-align: center;
+        padding: 60px 20px;
+        background: #e0f7e9;
+      }
+      .hero h1 {
+        color: #007f4e;
+        font-size: 36px;
+      }
+      .hero p {
+        margin-top: 10px;
+        color: #444;
+        font-size: 18px;
+      }
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        padding: 40px;
+      }
+      .category-card {
+        background: white;
+        border-radius: 12px;
+        text-align: center;
+        padding: 25px 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .category-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+      }
+      .category-card img {
+        width: 200px;
+        height: 150px;
+      }
+      .category-card h3 {
+        margin-top: 15px;
+        color: #007f4e;
+        font-size: 18px;
+      }
+      footer {
+        text-align: center;
+        background: #007f4e;
+        color: white;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li>
+            <a href="{{ url_for('category') }}" class="active">Categories</a>
+          </li>
+          <li>
+            <a
+              href="{{ url_for('cart') }}"
+              id="cart-btn"
+              style="text-decoration: none; color: white; cursor: pointer"
+            >
+              🛒 Cart (0)
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Shop by Category</h1>
+      <p>Find everything you need in one place</p>
+    </section>
+
+    <section class="category-grid" id="category-grid"></section>
+
+    <script>
+      const categories = [
+        {
+          name: "Grocery & Staples",
+          img: "/static/images/grocery.jpg",
+          link: "/grocery",
+        },
+        {
+          name: "Fruits & Vegetables",
+          img: "/static/images/fruits and veg.webp",
+          link: "/fruits",
+        },
+        {
+          name: "Dairy & Bakery",
+          img: "/static/images/dairy.jpg",
+          link: "/dairy",
+        },
+        {
+          name: "Snacks & Beverages",
+          img: "/static/images/snack.jpg",
+          link: "/snacks",
+        },
+        {
+          name: "Household Needs",
+          img: "/static/images/house.png",
+          link: "/household",
+        },
+        {
+          name: "Personal Care",
+          img: "/static/images/care.png",
+          link: "/personal",
+        },
+        { name: "Baby Care", img: "/static/images/baby.jpg", link: "/baby" },
+        {
+          name: "Beauty Products",
+          img: "/static/images/beauty.jpg",
+          link: "/beauty",
+        },
+        {
+          name: "Stationery",
+          img: "/static/images/bookpen.jpg",
+          link: "/stationery",
+        },
+        {
+          name: "Pooja Items",
+          img: "/static/images/pooja.jpg",
+          link: "/pooja",
+        },
+      ];
+
+      const grid = document.getElementById("category-grid");
+      categories.forEach((cat) => {
+        const card = document.createElement("div");
+        card.classList.add("category-card");
+        card.innerHTML = `<img src="${cat.img}" alt="${cat.name}"><h3>${cat.name}</h3>`;
+        card.onclick = () => {
+          window.location.href = cat.link;
+        };
+        grid.appendChild(card);
+      });
+
+      // ✅ Shared Cart Count
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const cartBtn = document.getElementById("cart-btn");
+      cartBtn.textContent = `🛒 Cart (${cart.length})`;
+      cartBtn.addEventListener("click", () => {
+        window.location.href = "home.html"; // redirect to home to view cart
+      });
+    </script>
+  </body>
+</html>

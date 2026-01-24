@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Returns Policy - Smart Shopping System</title>
+
+    <style>
+      /* Base reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: #f0f2f5;
+        color: #333;
+      }
+
+      /* Header */
+      header {
+        background: #4caf50;
+        color: #fff;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Navbar */
+      nav {
+        display: flex;
+        justify-content: center;
+        background: #2e7d32;
+        padding: 12px 0;
+        gap: 30px;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: 0.3s;
+        cursor: pointer;
+      }
+
+      nav a:hover {
+        color: #ffeb3b;
+        transform: scale(1.1);
+      }
+
+      /* Section container */
+      section {
+        background: #fff;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 35px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      section h1 {
+        color: #2e7d32;
+        font-size: 2rem;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      section h2 {
+        color: #4caf50;
+        font-size: 1.3rem;
+        margin: 20px 0 10px 0;
+      }
+
+      section p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 10px;
+        line-height: 1.6;
+      }
+
+      /* Back Home Button */
+      .home-btn {
+        display: block;
+        width: 220px;
+        text-align: center;
+        margin: 30px auto 10px auto;
+        padding: 12px 20px;
+        background: #4caf50;
+        color: #fff;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+
+      .home-btn:hover {
+        background: #2e7d32;
+        transform: scale(1.05);
+      }
+
+      /* Simple fade-in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        section {
+          margin: 20px;
+          padding: 20px;
+        }
+        nav {
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>Returns Policy - Smart Shopping System</header>
+
+    <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+
+      <!-- <a href="#returns">Return Policy</a> -->
+    </nav>
+
+    <section id="returns">
+      <h1>Returns Policy</h1>
+
+      <p>
+        We want you to be completely satisfied with your purchase. If for any
+        reason you are not happy, you can return your items easily by following
+        the guidelines below.
+      </p>
+
+      <h2>Return Period</h2>
+      <p>
+        Items can be returned within <strong>30 days</strong> from the date of
+        delivery. Ensure the items are in their original packaging and unused
+        condition.
+      </p>
+
+      <h2>Refund Process</h2>
+      <p>
+        Once we receive your returned item, our team will inspect it. If
+        approved, your refund will be initiated within
+        <strong>5 business days</strong> to your original payment method.
+      </p>
+
+      <h2>Return Address</h2>
+      <p>🏢 Smart Shopping Returns,<br />Green Street, Shopping City, Pune</p>
+
+      <h2>Customer Support</h2>
+      <p>📞 Phone: +91-98765-43210</p>
+      <p>✉️ Email: returns@smartshopping.com</p>
+
+      <a class="home-btn" href="{{ url_for('home') }}">⬅ Back to Home</a>
+    </section>
+  </body>
+</html>

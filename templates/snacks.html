@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snacks & Beverages | My Shop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f9f9f9;
+        color: #333;
+      }
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      header a.active,
+      header a:hover {
+        text-decoration: underline;
+      }
+      main {
+        padding: 40px;
+      }
+      h1 {
+        color: #007f4e;
+        margin-bottom: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+      }
+      .product-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+      }
+      .product-card h3 {
+        margin: 15px 0 10px;
+        color: #007f4e;
+      }
+      .product-card p {
+        margin-bottom: 10px;
+      }
+      button {
+        background: #007f4e;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+      button:hover {
+        background: #005f3b;
+      }
+      footer {
+        text-align: center;
+        background: #007f4e;
+        color: white;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('cart') }}">Cart</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Snacks & Beverages</h1>
+      <div class="product-grid" id="product-grid"></div>
+    </main>
+
+    <script>
+      const products = [
+        {
+          name: "Lays Chips (100g)",
+          price: 40,
+          img: "/static/images/lays.jpg",
+        },
+        { name: "Kurkure (90g)", price: 30, img: "/static/images/kurkure.jpg" },
+        {
+          name: "Bingo Mad Angles (100g)",
+          price: 35,
+          img: "/static/images/bingo.jpg",
+        },
+        {
+          name: "Parle-G Biscuits (500g)",
+          price: 71,
+          img: "/static/images/parleg.jpg",
+        },
+        {
+          name: "Oreo Biscuits (120g)",
+          price: 35,
+          img: "/static/images/oreo.png",
+        },
+        {
+          name: "Coca-Cola (1.25L)",
+          price: 66,
+          img: "/static/images/cocacola.jpg",
+        },
+        { name: "Pepsi (1L)", price: 50, img: "/static/images/pepsi.jpg" },
+        { name: "Frooti (600ml)", price: 40, img: "/static/images/frooti.jpg" },
+        {
+          name: "Red Bull (250ml)",
+          price: 130,
+          img: "/static/images/redbull.png",
+        },
+        {
+          name: "Nescafe Coffee (100g)",
+          price: 520,
+          img: "/static/images/nescafe.jpg",
+        },
+      ];
+
+      const grid = document.getElementById("product-grid");
+      products.forEach((p) => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Price: ₹${p.price}</p>
+      <button onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
+    `;
+        grid.appendChild(card);
+      });
+
+      function addToCart(name, price, img) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const existing = cart.find((item) => item.name === name);
+
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ name, price, img, quantity: 1 });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(name + " added to cart at ₹" + price);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyGrocery | Offers</title>
+    <style>
+      /* Reset and Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      /* Header */
+      header {
+        background-color: #2e8b57;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: #ffeb3b;
+        border-bottom: 2px solid #ffeb3b;
+        padding-bottom: 3px;
+      }
+
+      /* Featured Section */
+      .featured {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(135deg, #ffffff, #e8f5e9);
+      }
+
+      .featured h2 {
+        font-size: 2.2rem;
+        color: #2e8b57;
+        margin-bottom: 0.5rem;
+      }
+
+      .featured p {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 2rem;
+      }
+
+      /* Product Grid */
+      .products {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .product {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .product img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .product h3 {
+        font-size: 1.2rem;
+        color: #2e8b57;
+        margin-top: 1rem;
+      }
+
+      .product p {
+        color: #555;
+        margin: 0.5rem 0 1rem;
+      }
+
+      .shop-btn {
+        background: #2e8b57;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+
+      .shop-btn:hover {
+        background: #246b45;
+      }
+
+      .product:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 16px rgba(46, 139, 87, 0.2);
+      }
+
+      /* Footer */
+      footer {
+        background-color: #2e8b57;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        margin-top: 3rem;
+        font-size: 0.9rem;
+      }
+
+      .footer-bottom {
+        opacity: 0.9;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        nav ul {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .products {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .product {
+          width: 80%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">MyGrocery</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('offers') }}" class="active">Offers</a></li>
+          <li><a href="{{ url_for('stores') }}">Stores</a></li>
+          <li><a href="{{ url_for('contact') }}">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section class="featured">
+      <h2>Special Offers</h2>
+      <p>Save big on your favorite grocery items!</p>
+
+      <div class="products">
+        <!-- Offer 1 -->
+        <a href="{{ url_for('buy_to_get_one') }}" class="product">
+          <img src="/static/images/buy1.jpg" alt="Offer" />
+          <h3>Buy 2 Get 1 Free</h3>
+          <p>On select biscuits & snacks</p>
+        </a>
+
+        <!-- Offer 2 -->
+        <a href="{{ url_for('cleaning_essentials') }}" class="product">
+          <img src="/static/images/On cleaning .jpg" alt="Discount" />
+          <h3>Up to 50% Off</h3>
+          <p>On cleaning essentials</p>
+        </a>
+
+        <!-- Offer 3 -->
+        <a href="{{ url_for('fresh_fruits') }}" class="product">
+          <img src="/static/images/freshfruits.jpg" alt="Fruits Offer" />
+          <h3>50% Off Fresh Fruits</h3>
+          <p>Limited time healthy offer!</p>
+        </a>
+
+        <!-- Offer 4 -->
+        <a href="{{ url_for('Milk_Dairy_Products') }}" class="product">
+          <img src="/static/images/buyyyy.jpg" alt="Dairy Offer" />
+          <h3>Buy 1 Get 1 Free</h3>
+          <p>On milk & dairy products</p>
+        </a>
+
+        <!-- Offer 5 -->
+        <a href="{{ url_for('fresh_vegetables') }}" class="product">
+          <img src="/static/images/vegetables_img.jpg" alt="Vegetables Offer" />
+          <h3>Flat 20% Off</h3>
+          <p>On fresh vegetables</p>
+        </a>
+      </div>
+    </section>
+  </body>
+</html>

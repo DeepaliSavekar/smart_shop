@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Info - Smart Shopping System</title>
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: #f0f2f5;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      header {
+        background: #4caf50;
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: center;
+        background: #2e7d32;
+        padding: 10px 0;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 20px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      nav a:hover {
+        color: #ffeb3b;
+        transform: scale(1.1);
+      }
+
+      /* Section styles */
+      section {
+        background: white;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      }
+
+      section h1 {
+        color: #2e7d32;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        text-align: center;
+      }
+
+      section h2 {
+        color: #4caf50;
+        margin: 15px 0 8px 0;
+        font-size: 1.3rem;
+      }
+
+      section p {
+        margin-bottom: 12px;
+        color: #555;
+        font-size: 1rem;
+      }
+
+      /* Button to go back home */
+      .home-btn {
+        display: block;
+        width: 200px;
+        margin: 20px auto 40px auto;
+        padding: 12px 20px;
+        background: #4caf50;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+
+      .home-btn:hover {
+        background: #2e7d32;
+        transform: scale(1.05);
+      }
+
+      @media (max-width: 600px) {
+        section {
+          margin: 20px;
+          padding: 20px;
+        }
+
+        nav a {
+          margin: 0 10px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>Delivery Info - Smart Shopping System</header>
+
+    <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+    </nav>
+
+    <section>
+      <h1>Delivery Info</h1>
+      <p>
+        We aim to make your shopping experience as smooth and convenient as
+        possible with reliable delivery options.
+      </p>
+
+      <h2 id="shipping">Shipping Options</h2>
+      <p>
+        🚚 Standard Delivery: 3-7 business days - Free for orders over 50 Rs
+      </p>
+      <p>🚀 Express Delivery: 1-3 business days - 10% flat rate</p>
+
+      <h2 id="tracking">Order Tracking</h2>
+      <p>
+        Once your order ships, a tracking number will be emailed to you. You can
+        track your shipment online at any time.
+      </p>
+
+      <h2 id="charges">Shipping Charges</h2>
+      <p>
+        Standard shipping is free for orders above 50 Rs. For orders below 50
+        Rs, a 5 Rs shipping fee applies. Express shipping costs 10% flat rate
+        regardless of order size.
+      </p>
+
+      <h2 id="address">Delivery Address</h2>
+      <p>
+        Make sure your delivery address is correct. We cannot guarantee delivery
+        if incorrect details are provided.
+      </p>
+
+      <a class="home-btn" href="{{ url_for('home') }}">⬅ Back to Home</a>
+    </section>
+  </body>
+</html>

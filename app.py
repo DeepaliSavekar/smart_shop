@@ -1,0 +1,469 @@
+from flask import Flask, request, jsonify, render_template,flash
+from flask_cors import CORS
+import mysql.connector
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import redirect, url_for
+
+
+import random
+from twilio.rest import Client
+
+
+app = Flask(__name__)
+CORS(app)
+
+# -------------------------
+# MySQL CONNECTION
+# -------------------------
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="***REMOVED_DB_PASSWORD***",   
+    database="smartshopping"
+)
+
+cursor = db.cursor(dictionary=True)
+
+# --------------------------------------------------------
+# CREATE TABLES IF NOT EXIST
+# --------------------------------------------------------
+def create_tables():
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100),
+            email VARCHAR(100) UNIQUE,
+            password VARCHAR(100)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            price INT,
+            img VARCHAR(255),
+            category VARCHAR(50)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS cart (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            price INT,
+            img VARCHAR(255),
+            quantity INT DEFAULT 1
+        )
+    """)
+
+    db.commit()
+
+
+# --------------------------------------------------------
+# SEED PRODUCTS (only once)
+# --------------------------------------------------------
+def seed_products():
+    cursor.execute("SELECT COUNT(*) AS total FROM products")
+    count = cursor.fetchone()['total']
+
+    if count == 0:
+        products_list = [
+            ("Pampers Diapers (Pack of 40)", 650, "/images/diapers.png", "baby"),
+            ("Baby Lotion (Himalaya, 200ml)", 180, "/images/babylotion.jpg", "baby"),
+            ("Baby Shampoo (Johnson’s, 100ml)", 120, "/images/babyshampoo.jpg", "baby"),
+            ("Baby Soap (Dove, 4 pcs)", 150, "/images/babysoap.jpg", "baby"),
+            ("Baby Powder (Johnson’s, 200g)", 160, "/images/babypowder.jpg", "baby"),
+            ("Baby Oil (Johnson’s, 200ml)", 140, "/images/babyoil.jpg", "baby"),
+            ("Feeding Bottle (Philips Avent, 250ml)", 499, "/images/feeding-bottle.jpg", "baby"),
+            ("Baby Toothbrush (Pigeon Soft Grip)", 120, "/images/brush.jpg", "baby"),
+            ("Baby Cream (Himalaya, 50g)", 90, "/images/babycream.jpg", "baby"),
+            ("Baby Cloth Set", 400, "/images/babycloth.jpg", "baby"),
+
+            ("Lipstick (Lakme, 4g)", 350, "/images/lipstick.jpg", "beauty"),
+            ("Eyeliner (Maybelline, 3ml)", 220, "/images/eyeliner.jpg", "beauty"),
+            ("Foundation (L’Oréal, 30ml)", 450, "/images/foundation.jpg", "beauty"),
+            ("Compact Powder (Lakme, 9g)", 250, "/images/compact.jpg", "beauty"),
+            ("Nail Polish (Colorbar, 6ml)", 180, "/images/nailpolish.jpg", "beauty"),
+            ("Makeup Brush Set", 300, "/images/brushset.jpg", "beauty"),
+            ("Perfume (Fogg, 100ml)", 320, "/images/perfume.jpg", "beauty"),
+            ("Face Mask (Sheet, Pack of 3)", 150, "/images/facemask.jpg", "beauty"),
+            ("Makeup Remover (Garnier, 125ml)", 190, "/images/remover.jpg", "beauty"),
+            ("Kajal (Himalaya, 1.2g)", 120, "/images/kajal.jpg", "beauty")
+        ]
+
+        cursor.executemany("""
+            INSERT INTO products (name, price, img, category)
+            VALUES (%s, %s, %s, %s)
+        """, products_list)
+
+        db.commit()
+        print("✅ Products inserted successfully!")
+# -------------------------
+
+
+# INDEX PAGE
+# -------------------------
+@app.route('/')
+def index():
+    return render_template("index.html")
+
+# -------------------------
+
+
+# HOME PAGE
+# -------------------------
+@app.route('/home')
+def home():
+    return render_template("home.html")
+
+# -------------------------
+
+
+# REGISTER (Backend API)
+# -------------------------
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get("fullname")
+        email = request.form.get("email")
+        phone=request.form.get("mobile")
+        password = request.form.get("password")
+
+        if not name or not email or not password:
+            return "All fields are required!", 400
+
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        if cursor.fetchone():
+            return "Email already registered!", 400
+
+        hashed_password = generate_password_hash(password)
+        cursor.execute(
+            "INSERT INTO users (name, email,phone, password) VALUES (%s, %s,%s, %s)",
+            (name, email,phone,hashed_password)
+        )
+        db.commit()
+
+        return redirect("/login")  
+
+    return render_template("/register.html")  
+
+# -------------------------
+
+
+# LOGIN
+# -------------------------
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+
+        if user and check_password_hash(user['password'], password):
+            return redirect("/home")  
+        else:
+            return "Invalid credentials!", 401
+
+    return render_template("/login.html")  
+
+
+
+#-------------------------------------------------------------------------------------
+@app.route("/category.html")
+def category():
+    return render_template("category.html")
+
+#----------------------------------------------------------------
+
+@app.route('/offers')
+def offers():
+    return render_template("offers.html")
+
+#----------------------------------------------------------------
+
+@app.route('/stores')
+def stores():
+    return render_template("stores.html")
+
+#----------------------------------------------------------------
+
+@app.route('/contact')
+def contact():
+    return render_template("contact.html")
+
+#----------------------------------------------------------------
+@app.route('/help-centre')
+def help_centre():
+    return render_template("Help_centre.html")
+
+
+#----------------------------------------------------------------
+
+@app.route('/delivery-info')
+def delivery_info():
+    return render_template("delivery_info.html")
+
+#----------------------------------------------------------------
+
+@app.route('/returns-policy')
+def returns_policy():
+    return render_template("Return_policy.html")
+
+#----------------------------------------------------------------
+
+@app.route('/cart')
+def cart():
+    return render_template("cart.html")
+
+#----------------------------------------------------------------
+
+@app.route('/grocery')
+def grocery():
+    return render_template("grocery.html")
+
+#----------------------------------------------------------------
+
+@app.route('/fruits')
+def fruits():
+    return render_template("fruits.html")
+
+#----------------------------------------------------------------
+
+@app.route('/dairy')
+def dairy():
+    return render_template("dairy.html")
+
+#----------------------------------------------------------------
+
+@app.route('/snacks')
+def snacks():
+    return render_template("snacks.html")
+
+#----------------------------------------------------------------
+
+@app.route('/household')
+def household():
+    return render_template("household.html")
+
+#----------------------------------------------------------------
+
+@app.route('/personal')
+def personal():
+    return render_template("personal.html")
+
+#----------------------------------------------------------------
+
+@app.route('/baby')
+def baby():
+    return render_template("baby.html")
+
+#----------------------------------------------------------------
+
+@app.route('/beauty')
+def beauty():
+    return render_template("beauty.html")
+
+#----------------------------------------------------------------
+
+@app.route('/stationery')
+def stationery():
+    return render_template("stationery.html")
+
+#----------------------------------------------------------------
+
+@app.route('/pooja')
+def pooja():
+    return render_template("pooja.html")
+
+#----------------------------------------------------------------
+@app.route('/buy_to_get_one')
+def buy_to_get_one():
+    return render_template("buy_to_get_one.html")
+
+
+
+#----------------------------------------------------------------
+
+@app.route('/cleaning_essentials')
+def cleaning_essentials():
+    return render_template("cleaning_essentials.html")
+
+
+
+#---------------------------------------------------------------------
+@app.route('/fresh_fruits')
+def fresh_fruits():
+    return render_template("fresh_fruits.html")
+#------------------------------------------------------------------------------
+
+@app.route('/Milk_Dairy_Products')
+def Milk_Dairy_Products():
+    return render_template("Milk_Dairy_Products.html")
+
+#----------------------------------------------------------------------
+
+@app.route('/fresh_vegetables')
+def fresh_vegetables():
+    return render_template("fresh_vegetables.html")
+
+# -------------------------
+
+
+
+
+# GET PRODUCTS
+# -------------------------
+@app.route('/api/products/<category_name>', methods=['GET'])
+def get_products(category_name):
+    cursor.execute("SELECT * FROM products WHERE category=%s", (category_name,))
+    products = cursor.fetchall()
+    return jsonify(products)
+
+# -------------------------
+
+
+
+
+# ADD TO CART
+# -------------------------
+@app.route('/api/cart/add', methods=['POST'])
+def add_to_cart():
+    data = request.json
+    name = data['name']
+
+    cursor.execute("SELECT * FROM cart WHERE name=%s", (name,))
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.execute(
+            "UPDATE cart SET quantity = quantity + 1 WHERE name=%s",
+            (name,)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO cart (name, price, img, quantity) VALUES (%s, %s, %s, 1)",
+            (data['name'], data['price'], data['img'])
+        )
+
+    db.commit()
+    return jsonify({"message": "Item added/updated"})
+
+# -------------------------
+
+
+# GET CART
+# -------------------------
+@app.route('/api/cart', methods=['GET'])
+def get_cart():
+    cursor.execute("SELECT * FROM cart")
+    items = cursor.fetchall()
+    return jsonify(items)
+
+# -------------------------
+
+
+# UPDATE CART
+# -------------------------
+@app.route('/api/cart/update/<int:item_id>', methods=['PUT'])
+def update_cart(item_id):
+    data = request.json
+    change = data['change']
+
+    cursor.execute("UPDATE cart SET quantity = quantity + %s WHERE id=%s",
+                   (change, item_id))
+    db.commit()
+
+    cursor.execute("DELETE FROM cart WHERE quantity <= 0")
+    db.commit()
+
+    return jsonify({"message": "Cart updated"})
+
+# -------------------------
+
+
+# DELETE ITEM
+# -------------------------
+@app.route('/api/cart/<int:item_id>', methods=['DELETE'])
+def remove_item(item_id):
+    cursor.execute("DELETE FROM cart WHERE id=%s", (item_id,))
+    db.commit()
+    return jsonify({"message": "Item removed"})
+
+# -------------------------
+
+
+# START SERVER
+# -------------------------
+if __name__ == '__main__':
+    create_tables()
+    seed_products()
+    print("🚀 Flask running on http://127.0.0.1:5000/")
+    app.run(debug=True)
+
+
+# -------------------------------------------------
+
+
+
+app.secret_key = os.getenv('SECRET_KEY')   # change in production
+
+# ---------------- TWILIO CONFIG ----------------
+ACCOUNT_SID = "***REMOVED_TWILIO_SID***"
+AUTH_TOKEN = "***REMOVED_TWILIO_TOKEN***"
+TWILIO_PHONE = "***REMOVED_PHONE***"   # Twilio phone number
+
+client = Client(ACCOUNT_SID, AUTH_TOKEN)
+
+# ---------------- ROUTES ----------------
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/send_otp", methods=["POST"])
+def send_otp():
+    phone = request.form.get("phone")
+
+    if not phone:
+        flash("Phone number required")
+        return redirect(url_for("index"))
+
+    otp = random.randint(100000, 999999)
+    session["otp"] = str(otp)
+    session["phone"] = phone
+
+    try:
+        client.messages.create(
+            body=f"Your OTP for Smart Shopping System is {otp}",
+            from_=TWILIO_PHONE,
+            to=phone
+        )
+        flash("OTP sent successfully")
+    except Exception as e:
+        flash("Failed to send OTP")
+        print(e)
+
+    return redirect(url_for("index"))
+
+
+@app.route("/verify-otp", methods=["POST"])
+def verify_otp():
+    entered_otp = request.form.get("otp")
+    session_otp = session.get("otp")
+
+    if entered_otp == session_otp:
+        session.pop("otp", None)
+        session.pop("phone", None)
+        return redirect(url_for("login"))
+    else:
+        flash("Invalid OTP")
+        return redirect(url_for("register"))
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

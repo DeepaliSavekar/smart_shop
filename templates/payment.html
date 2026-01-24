@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment | My Shop</title>
+<style>
+  body {
+    font-family: "Poppins", sans-serif;
+    background: #f9f9f9;
+    padding: 20px;
+  }
+  .container {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    text-align: center;
+    color: #007f4e;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  button {
+    width: 100%;
+    margin-top: 25px;
+    background: #007f4e;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button:hover {
+    background: #005f3b;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Payment</h1>
+  <form id="paymentForm" onsubmit="return validatePayment()">
+    <label for="method">Select Payment Method:</label>
+    <select id="method" required>
+      <option value="">--Select--</option>
+      <option value="card">Credit / Debit Card</option>
+      <option value="upi">UPI</option>
+      <!-- <option value="cod">Cash on Delivery</option> -->
+    </select>
+
+    <div id="cardDetails" style="display:none;">
+      <label>Card Number</label>
+      <input type="text" id="cardNumber" placeholder="Enter 16-digit card number">
+      <label>Expiry Date</label>
+      <input type="month" id="expiry">
+      <label>CVV</label>
+      <input type="password" id="cvv" maxlength="3" placeholder="XXX">
+    </div>
+
+    <div id="upiDetails" style="display:none;">
+      <label>UPI ID</label>
+      <input type="text" id="upiId" placeholder="example@upi">
+    </div>
+
+    <button type="submit">Pay Now</button>
+  </form>
+</div>
+
+<script>
+  const methodSelect = document.getElementById('method');
+  const cardDetails = document.getElementById('cardDetails');
+  const upiDetails = document.getElementById('upiDetails');
+
+  methodSelect.addEventListener('change', () => {
+    cardDetails.style.display = methodSelect.value === 'card' ? 'block' : 'none';
+    upiDetails.style.display = methodSelect.value === 'upi' ? 'block' : 'none';
+  });
+
+  function validatePayment(){
+    const method = methodSelect.value;
+    if(method === ''){
+      alert('Please select a payment method!');
+      return false;
+    }
+
+    if(method === 'card'){
+      const card = document.getElementById('cardNumber').value.trim();
+      const cvv = document.getElementById('cvv').value.trim();
+      if(card.length !== 16 || isNaN(card)){
+        alert('Enter valid 16-digit card number!');
+        return false;
+      }
+      if(cvv.length !== 3 || isNaN(cvv)){
+        alert('Enter valid 3-digit CVV!');
+        return false;
+      }
+    }
+
+    if(method === 'upi'){
+      const upi = document.getElementById('upiId').value.trim();
+      if(!upi.includes('@')){
+        alert('Enter valid UPI ID!');
+        return false;
+      }
+    }
+
+    alert('✅ Payment Successful! Thank you for shopping with My Shop.');
+    localStorage.removeItem('cart');
+    window.location.href = "home.html";
+    return false;
+  }
+</script>
+
+</body>
+</html>

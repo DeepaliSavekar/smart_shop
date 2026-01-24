@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Milk & Dairy Offer</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f9fbff;
+      }
+
+      /* Banner */
+      .banner {
+        background: linear-gradient(135deg, #83adeb, #78c6ff);
+        text-align: center;
+        padding: 45px 20px;
+        color: white;
+      }
+      .banner h1 {
+        margin: 0;
+        font-size: 44px;
+        font-weight: 800;
+      }
+      .banner p {
+        margin-top: 10px;
+        font-size: 20px;
+      }
+
+      /* Products Grid */
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 30px;
+        max-width: 1100px;
+        margin: auto;
+      }
+
+      .product {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: 0.3s;
+      }
+      .product:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Image styling updated */
+      .product img {
+        width: 100%;
+        height: 140px;
+        object-fit: contain;
+        background-color: #fff;
+        border-bottom: 1px solid #eaeaea;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .product-info {
+        padding: 15px;
+        text-align: center;
+      }
+
+      .product-info h3 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: bold;
+      }
+
+      .price {
+        margin-top: 8px;
+        font-size: 16px;
+        color: #3d8bfd;
+        font-weight: bold;
+      }
+
+      .btn {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 8px 18px;
+        background: #3d8bfd;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: 0.3s;
+      }
+      .btn:hover {
+        background: #1f6fe0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Banner -->
+    <div class="banner">
+      <h1>Buy 1 Get 1 Free</h1>
+      <p>On milk & dairy products</p>
+    </div>
+
+    <!-- Products -->
+    <div class="products">
+      <div class="product">
+        <img src="/static/images/Fresh_milk.jpg" alt="Amul Milk" />
+        <div class="product-info">
+          <h3>Fresh Cow Milk</h3>
+          <p class="price">₹67</p>
+          <a href="#" class="btn">Add to Cart</a>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="/static/images/cheeseeeeee.jpg" alt="Cheese Block" />
+        <div class="product-info">
+          <h3>Cheddar Cheese</h3>
+          <p class="price">₹220</p>
+          <a href="#" class="btn">Add to Cart</a>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="/static/images/yogurt.jpg" alt="Yogurt Cup" />
+        <div class="product-info">
+          <h3>Natural Yogurt</h3>
+          <p class="price">₹65</p>
+          <a href="#" class="btn">Add to Cart</a>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="/static/images/makhan.jpg" alt="Butter Pack" />
+        <div class="product-info">
+          <h3>Salted Butter</h3>
+          <p class="price">₹120</p>
+          <a href="#" class="btn">Add to Cart</a>
+        </div>
+      </div>
+
+      <div class="product">
+        <img src="/static/images/Fresh_Paneer.jpg" alt="Paneer" />
+        <div class="product-info">
+          <h3>Fresh Paneer</h3>
+          <p class="price">₹140</p>
+          <a href="#" class="btn">Add to Cart</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

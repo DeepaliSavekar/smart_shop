@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Shopping System</title>
+    <style>
+      /* Base Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: #f0f2f5;
+        color: #333;
+      }
+
+      /* Navbar */
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        background: linear-gradient(90deg, #4caf50, #2e7d32);
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      nav h2 {
+        font-size: 1.5rem;
+      }
+
+      nav .menu a {
+        margin-left: 25px;
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+        transition: 0.3s;
+        cursor: pointer;
+      }
+
+      nav .menu a:hover {
+        color: #ffeb3b;
+        transform: scale(1.1);
+      }
+
+      /* Hero Section */
+      .hero {
+        text-align: center;
+        padding: 80px 20px;
+        background: linear-gradient(135deg, #81c784, #aed581);
+        color: white;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      /* Section cards */
+      .content {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin: 40px 20px;
+      }
+
+      section {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        flex: 1 1 350px;
+        max-width: 600px;
+        transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+        display: none;
+        opacity: 0;
+      }
+
+      section.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      section h1 {
+        margin-bottom: 15px;
+        color: #2e7d32;
+      }
+
+      section h2 {
+        color: #4caf50;
+        margin: 15px 0 8px 0;
+        font-size: 1.2rem;
+      }
+
+      section p {
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 10px;
+      }
+
+      /* FAQ style */
+      .faq-item {
+        margin-bottom: 15px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .content {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+
+      .home-btn {
+        background-color: #12b831;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        align-items: center;
+      }
+
+      .home-btn:hover {
+        background-color: #38ae28;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <h2>Smart Shopping 🛍️</h2>
+      <div class="menu">
+        <a onclick="showSection('help')">Help Centre</a>
+        <a href="{{ url_for('delivery_info') }}">Delivery Info</a>
+        <a href="{{ url_for('returns_policy') }}">Returns Policy</a>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <h1>Welcome to Smart Shopping System 🛍️</h1>
+      <p>Shop Smarter, Faster, and Without a Cashier!</p>
+    </div>
+
+    <div class="content">
+      <!-- Help Centre -->
+      <section id="help" class="active">
+        <h1>Help Centre</h1>
+        <p>
+          Our Help Centre is here to assist you with any questions, concerns, or
+          guidance you need while shopping with us.
+        </p>
+
+        <h2>Contact Information</h2>
+        <p>📞 Phone: +91‑98765‑43210</p>
+        <p>✉️ Email: support@smartshopping.com</p>
+        <p>
+          🏢 Address: MyGrocery Pvt. Ltd. 123 Green Street, Shopping City,Pune
+        </p>
+
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+          <strong>Q: How do I track my order?</strong>
+          <p>
+            A: Once your order is shipped, we will email you a tracking number.
+            You can track it online.
+          </p>
+        </div>
+        <div class="faq-item">
+          <strong>Q: Can I cancel my order?</strong>
+          <p>
+            A: Orders can be canceled within 2 hours of placing them by
+            contacting our support team.
+          </p>
+        </div>
+        <div class="faq-item">
+          <strong>Q: Do you have customer support 24/7?</strong>
+          <p>
+            A: Yes, our support team is available 24/7 to help you with any
+            issues.
+          </p>
+        </div>
+
+        <a class="home-btn" href="{{ url_for('home') }}">⬅ Back to Home</a>
+      </section>
+    </div>
+
+    <script>
+      function showSection(sectionId) {
+        const sections = document.querySelectorAll("section");
+        sections.forEach((sec) => sec.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+      }
+    </script>
+  </body>
+</html>

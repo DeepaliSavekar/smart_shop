@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smart Shopping System | User Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: "Poppins", "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #43cea2, #185a9d);
+      }
+
+      .card {
+        background: #fff;
+        width: 100%;
+        max-width: 420px;
+        padding: 35px 30px;
+        border-radius: 18px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        animation: fadeIn 0.6s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h2 {
+        color: #185a9d;
+        margin-bottom: 10px;
+      }
+
+      p {
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 25px;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px;
+        font-size: 15px;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+        outline: none;
+        margin-bottom: 15px;
+        transition:
+          border 0.3s,
+          box-shadow 0.3s;
+      }
+
+      input:focus {
+        border-color: #43cea2;
+        box-shadow: 0 0 8px rgba(67, 206, 162, 0.4);
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #43cea2, #185a9d);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(67, 206, 162, 0.5);
+      }
+
+      .link {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+
+      .link a {
+        color: #43cea2;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <!-- REGISTER -->
+      <div id="registerSection">
+        <h2>Create Account</h2>
+        <p>Register to continue</p>
+
+        <input id="fullName" type="text" placeholder="Full Name" required />
+        <input id="email" type="email" placeholder="Email" required />
+        <input
+          id="mobile"
+          type="text"
+          placeholder="Mobile Number"
+          maxlength="10"
+          required
+        />
+        <input id="password" type="password" placeholder="Password" required />
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          required
+        />
+
+        <button onclick="goToSendOtp()">Register</button>
+
+        <div class="link">
+          Already registered? <a onclick="goToSendOtp()">Send OTP</a>
+        </div>
+      </div>
+
+      <!-- SEND OTP -->
+      <div id="sendOtpSection" class="hidden">
+        <h2>Verify Your Phone</h2>
+        <p>Enter your mobile number to receive OTP</p>
+
+        <input
+          id="otpPhone"
+          type="text"
+          placeholder="+91 XXXXX XXXXX"
+          required
+        />
+
+        <button onclick="goToVerifyOtp()">Send OTP</button>
+
+        <div class="link">
+          <a onclick="goToRegister()">← Back</a>
+        </div>
+      </div>
+
+      <!-- VERIFY OTP -->
+      <div id="verifyOtpSection" class="hidden">
+        <h2>OTP Verification</h2>
+        <p>Enter the 6-digit OTP sent to your phone</p>
+
+        <input
+          id="otp"
+          type="text"
+          maxlength="6"
+          placeholder="● ● ● ● ● ●"
+          required
+        />
+        <button onclick="submit">Verify OTP</button>
+
+        <div class="link">Didn’t receive OTP? <a>Resend</a></div>
+      </div>
+    </div>
+
+    <script>
+      function goToSendOtp() {
+        // Register form validation
+        const name = document.getElementById("fullName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const pass = document.getElementById("password").value;
+        const confirm = document.getElementById("confirmPassword").value;
+
+        const nameRegex = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+        const mobileRegex = /^[6-9][0-9]{9}$/;
+        const passRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+        if (!nameRegex.test(name)) {
+          alert("❌ Enter a valid Full Name (letters only)");
+          return;
+        }
+
+        if (!emailRegex.test(email)) {
+          alert("❌ Enter a valid Email ID");
+          return;
+        }
+
+        if (!mobileRegex.test(mobile)) {
+          alert("❌ Enter valid 10-digit Mobile Number");
+          return;
+        }
+
+        if (!passRegex.test(pass)) {
+          alert(
+            "❌ Password must be at least 6 characters, contain 1 uppercase letter and 1 number",
+          );
+          return;
+        }
+
+        if (pass !== confirm) {
+          alert("❌ Passwords do not match");
+          return;
+        }
+
+        // Move to Send OTP section
+        document.getElementById("registerSection").classList.add("hidden");
+        document.getElementById("sendOtpSection").classList.remove("hidden");
+      }
+
+      function goToVerifyOtp() {
+        const phone = document.getElementById("otpPhone").value.trim();
+        const phoneRegex = /^[6-9][0-9]{9}$/;
+
+        if (!phoneRegex.test(phone)) {
+          alert("❌ Enter valid 10-digit mobile number");
+          return;
+        }
+
+        document.getElementById("sendOtpSection").classList.add("hidden");
+        document.getElementById("verifyOtpSection").classList.remove("hidden");
+      }
+
+      // function verifyOtp() {
+      //   const otp = document.getElementById("otp").value.trim();
+
+      //   if (!/^[0-9]{6}$/.test(otp)) {
+      //     alert("❌ OTP must be exactly 6 digits");
+      //     return;
+      //   }
+
+      //   alert("✅ OTP format valid (Backend will verify)");
+      // }
+    </script>
+  </body>
+</html>

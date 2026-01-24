@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grocery & Staples | My Shop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f9f9f9;
+        color: #333;
+      }
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      header a.active,
+      header a:hover {
+        text-decoration: underline;
+      }
+      main {
+        padding: 40px;
+      }
+      h1 {
+        color: #007f4e;
+        margin-bottom: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+      }
+      .product-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        width: 150px;
+        height: 150px;
+      }
+      .product-card h3 {
+        margin: 15px 0 10px;
+        color: #007f4e;
+      }
+      .product-card p {
+        margin-bottom: 10px;
+      }
+      button {
+        background: #007f4e;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+      button:hover {
+        background: #005f3b;
+      }
+      footer {
+        text-align: center;
+        background: #007f4e;
+        color: white;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('cart') }}">Cart</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Grocery & Staples (According to 1-kg quantity)</h1>
+      <div class="product-grid" id="product-grid"></div>
+    </main>
+
+    <script>
+      const products = [
+        { name: "DAAWAAT RICE", price: 160, img: "/static/images/rice.jpg" },
+        { name: "Wheat Flour", price: 58, img: "/static/images/flour.jpg" },
+        { name: "Sugar", price: 46, img: "/static/images/sugar.jpg" },
+        { name: "Salt", price: 21, img: "/static/images/salt.png" },
+        { name: "Cooking Oil", price: 164, img: "/static/images/oil.jpg" },
+        { name: "Toor Dal", price: 115, img: "/static/images/Dal.png" },
+        { name: "Besan", price: 96, img: "/static/images/besan.jpg" },
+        {
+          name: "Tea Powder",
+          price: 268,
+          img: "/static/images/Tea Powder.jpg",
+        },
+        { name: "Coffee", price: 250, img: "/static/images/coffee.png" },
+        { name: "Jaggery", price: 57, img: "/static/images/jaggery.png" },
+      ];
+
+      const grid = document.getElementById("product-grid");
+      products.forEach((p) => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Price: ₹${p.price}</p>
+      <button onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
+    `;
+        grid.appendChild(card);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dairy & Bakery | My Shop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f9f9f9;
+        color: #333;
+      }
+      header {
+        background: #007f4e;
+        color: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .logo {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      header ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      header a.active,
+      header a:hover {
+        text-decoration: underline;
+      }
+      main {
+        padding: 40px;
+      }
+      h1 {
+        color: #007f4e;
+        margin-bottom: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+      }
+      .product-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+      }
+      .product-card h3 {
+        margin: 15px 0 10px;
+        color: #007f4e;
+      }
+      .product-card p {
+        margin-bottom: 10px;
+      }
+      button {
+        background: #007f4e;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+      button:hover {
+        background: #005f3b;
+      }
+      footer {
+        text-align: center;
+        background: #007f4e;
+        color: white;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Smart Shop</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('category') }}">Categories</a></li>
+          <li><a href="{{ url_for('cart') }}">Cart</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Dairy & Bakery Products</h1>
+      <div class="product-grid" id="product-grid"></div>
+    </main>
+
+    <script>
+      const products = [
+        { name: "Amul Milk (1L)", price: 67, img: "/static/images/milk.png" },
+        { name: "Butter (500g)", price: 275, img: "/static/images/butter.png" },
+        { name: "Cheese (200g)", price: 128, img: "/static/images/cheese.jpg" },
+        { name: "Paneer (250g)", price: 120, img: "/static/images/paneer.png" },
+        { name: "Curd (500g)", price: 60, img: "/static/images/curd.jpg" },
+        { name: "Bread (1 pack)", price: 40, img: "/static/images/bread.jpg" },
+        { name: "Buns (pack of 4)", price: 50, img: "/static/images/buns.jpg" },
+        { name: "Cake (500g)", price: 350, img: "/static/images/CAKE.jpg" },
+        { name: "Eggs (1 dozen)", price: 84, img: "/static/images/eggs.jpg" },
+        {
+          name: "Pastries (1 piece)",
+          price: 90,
+          img: "/static/images/pestries.jpg",
+        },
+      ];
+
+      const grid = document.getElementById("product-grid");
+      products.forEach((p) => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Price: ₹${p.price}</p>
+      <button onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
+    `;
+        grid.appendChild(card);
+      });
+
+      function addToCart(name, price, img) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const existing = cart.find((item) => item.name === name);
+
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ name, price, img, quantity: 1 });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(name + " added to cart at ₹" + price);
+      }
+    </script>
+  </body>
+</html>

@@ -1,306 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Cart | My Shop</title>
+    <title>My Cart | Smart Shopping</title>
 
     <style>
-      body {
-        font-family: "Poppins", sans-serif;
-        background: #f9f9f9;
-        color: #333;
-        padding: 20px;
-      }
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
 
-      header {
-        background: #007f4e;
-        color: white;
-        padding: 15px 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
+        header {
+            background: #007f4e;
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-      header .logo {
-        font-size: 24px;
-        font-weight: 700;
-      }
+        header .logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
 
-      header ul {
-        list-style: none;
-        display: flex;
-        gap: 20px;
-      }
+        header ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
 
-      header a,
-      header button {
-        color: white;
-        text-decoration: none;
-        font-weight: 500;
-        background: none;
-        border: none;
-        cursor: pointer;
-      }
+        header a,
+        header button {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
 
-      h1 {
-        color: #007f4e;
-        text-align: center;
-        margin-bottom: 30px;
-      }
+        h1 {
+            color: #007f4e;
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-      table {
-        width: 100%;
-        max-width: 1000px;
-        margin: auto;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      }
+        table {
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
 
-      th,
-      td {
-        text-align: center;
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-      }
+        th,
+        td {
+            text-align: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
 
-      th {
-        background: #007f4e;
-        color: white;
-        font-weight: 600;
-      }
+        th {
+            background: #007f4e;
+            color: white;
+            font-weight: 600;
+        }
 
-      img {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-      }
+        img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
 
-      .qty-btn {
-        background: #007f4e;
-        color: white;
-        border: none;
-        padding: 5px 9px;
-        margin: 0 5px;
-        cursor: pointer;
-        border-radius: 3px;
-      }
+        .qty-btn {
+            background: #007f4e;
+            color: white;
+            border: none;
+            padding: 5px 9px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
 
-      button.remove-btn {
-        background: #e74c3c;
-        color: white;
-        padding: 8px 14px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-      }
+        button.remove-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
 
-      .total {
-        max-width: 1000px;
-        margin: 20px auto;
-        text-align: right;
-        font-size: 22px;
-        font-weight: 700;
-        color: #007f4e;
-      }
+        .total {
+            max-width: 1000px;
+            margin: 20px auto;
+            text-align: right;
+            font-size: 22px;
+            font-weight: 700;
+            color: #007f4e;
+        }
 
-      .checkout-btn {
-        display: block;
-        margin: auto;
-        background: #007f4e;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 5px;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-      }
+        .checkout-btn {
+            display: block;
+            margin: auto;
+            background: #007f4e;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
 
-      .form-container {
-        display: none;
-        background: white;
-        max-width: 500px;
-        margin: 40px auto;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-      .form-container input {
-        width: 100%;
-        margin: 12px 0;
-        padding: 12px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-      }
+        .payment-modal.active {
+            display: flex;
+        }
 
-      .form-container button {
-        width: 100%;
-        padding: 12px;
-        border-radius: 5px;
-        border: none;
-        background: #007f4e;
-        color: white;
-        font-size: 17px;
-      }
+        .payment-content {
+            background: white;
+            max-width: 600px;
+            width: 90%;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .payment-title {
+            text-align: center;
+            color: #007f4e;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .payment-method {
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: #007f4e;
+            background: #f0f9f5;
+        }
+
+        .payment-method.selected {
+            border-color: #007f4e;
+            background: #e6f4ee;
+        }
+
+        .payment-method-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .payment-method-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .wallet-balance {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .wallet-balance.show {
+            display: block;
+        }
+
+        .wallet-balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .wallet-balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007f4e;
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .payment-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .payment-btn.primary {
+            background: #007f4e;
+            color: white;
+        }
+
+        .payment-btn.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 2000;
+            min-width: 300px;
+        }
+
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .notification.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .insufficient-balance {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .insufficient-balance.show {
+            display: block;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <header>
-      <div class="logo">My Shop</div>
-      <nav>
-        <ul>
-          <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('category') }}">Categories</a></li>
-
-          <li>
-            <button onclick="window.location.href='cart.html'">🛒 Cart</button>
-          </li>
-        </ul>
-      </nav>
+        <div class="logo">Smart Shopping</div>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/category.html">Categories</a></li>
+                <li><a href="/wallet">💳 Wallet</a></li>
+                <li><button onclick="window.location.href='/cart'">🛒 Cart</button></li>
+            </ul>
+        </nav>
     </header>
 
     <h1>Your Shopping Cart</h1>
 
     <table id="cart-table">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Total</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
     </table>
 
     <div class="total" id="total">Grand Total: ₹0</div>
 
-    <button class="checkout-btn" onclick="showCheckoutForm()">
-      Proceed to Checkout
+    <button class="checkout-btn" onclick="showPaymentModal()">
+        Proceed to Checkout
     </button>
 
-    <div class="form-container" id="checkoutForm">
-      <h2 style="text-align: center; color: #007f4e">Checkout Form</h2>
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-content">
+            <h2 class="payment-title">Choose Payment Method</h2>
 
-      <input type="text" id="name" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Ema il Address" required />
-      <input type="tel" id="phone" placeholder="Phone Number" required />
+            <div class="payment-methods">
+                <div class="payment-method" onclick="selectPaymentMethod('wallet')">
+                    <div class="payment-method-icon">💳</div>
+                    <div class="payment-method-name">E-Wallet</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('cod')">
+                    <div class="payment-method-icon">💵</div>
+                    <div class="payment-method-name">Cash on Delivery</div>
+                </div>
+            </div>
 
-      <button onclick="checkout()">Confirm Order</button>
+            <div class="wallet-balance" id="walletBalance">
+                <div class="wallet-balance-label">Available Balance</div>
+                <div class="wallet-balance-amount" id="balanceAmount">₹0.00</div>
+            </div>
+
+            <div class="insufficient-balance" id="insufficientBalance">
+                ⚠️ Insufficient wallet balance. Please add money to your wallet or choose Cash on Delivery.
+                <a href="/wallet" style="color: #007f4e; text-decoration: underline;">Go to Wallet</a>
+            </div>
+
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="summarySubtotal">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Charges:</span>
+                    <span>₹40</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Amount:</span>
+                    <span id="summaryTotal">₹0</span>
+                </div>
+            </div>
+
+            <div class="payment-actions">
+                <button class="payment-btn secondary" onclick="closePaymentModal()">Cancel</button>
+                <button class="payment-btn primary" onclick="confirmPayment()" id="confirmBtn">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div id="notificationMessage"></div>
     </div>
 
     <script>
-      function loadCart() {
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let selectedPaymentMethod = '';
+        let walletBalance = 0;
+        let cartTotal = 0;
 
-        const tbody = document.querySelector("#cart-table tbody");
-        const totalDiv = document.getElementById("total");
+        function loadCart() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const tbody = document.querySelector("#cart-table tbody");
+            const totalDiv = document.getElementById("total");
 
-        tbody.innerHTML = "";
-        let grandTotal = 0;
+            tbody.innerHTML = "";
+            let grandTotal = 0;
 
-        if (cart.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="padding:30px;">Your cart is empty.</td></tr>`;
-          totalDiv.textContent = "Grand Total: ₹0";
-          return;
+            if (cart.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:30px;">Your cart is empty.</td></tr>`;
+                totalDiv.textContent = "Grand Total: ₹0";
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const total = item.price * item.quantity;
+                grandTotal += total;
+
+                const row = `
+                <tr>
+                    <td><img src="${item.img}"></td>
+                    <td>${item.name}</td>
+                    <td>₹${item.price}</td>
+                    <td>
+                        <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+                        ${item.quantity}
+                        <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                    </td>
+                    <td>₹${total}</td>
+                    <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+                </tr>`;
+
+                tbody.innerHTML += row;
+            });
+
+            cartTotal = grandTotal;
+            totalDiv.textContent = "Grand Total: ₹" + grandTotal;
         }
 
-        cart.forEach((item, index) => {
-          const total = item.price * item.quantity;
-          grandTotal += total;
+        function changeQty(index, change) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart[index].quantity += change;
 
-          const row = `
-        <tr>
-            <td><img src="${item.img}"></td>
-            <td>${item.name}</td>
-            <td>₹${item.price}</td>
-            <td>
-                <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
-                ${item.quantity}
-                <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
-            </td>
-            <td>₹${total}</td>
-            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
-        </tr>`;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
 
-          tbody.innerHTML += row;
-        });
-
-        totalDiv.textContent = "Grand Total: ₹" + grandTotal;
-      }
-
-      function changeQty(index, change) {
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        cart[index].quantity += change;
-
-        if (cart[index].quantity <= 0) {
-          cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            loadCart();
         }
 
-        localStorage.setItem("cart", JSON.stringify(cart));
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            loadCart();
+        }
+
+        function showPaymentModal() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            if (cart.length === 0) {
+                showNotification("Your cart is empty!", "error");
+                return;
+            }
+
+            // Load wallet balance
+            fetch('/api/wallet/balance')
+                .then(res => res.json())
+                .then(data => {
+                    walletBalance = data.balance || 0;
+                    document.getElementById('balanceAmount').textContent = '₹' + walletBalance.toFixed(2);
+                })
+                .catch(err => console.error(err));
+
+            // Update order summary
+            const deliveryCharge = 40;
+            const total = cartTotal + deliveryCharge;
+            document.getElementById('summarySubtotal').textContent = '₹' + cartTotal;
+            document.getElementById('summaryTotal').textContent = '₹' + total;
+
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            selectedPaymentMethod = '';
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            document.getElementById('walletBalance').classList.remove('show');
+            document.getElementById('insufficientBalance').classList.remove('show');
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.payment-method').classList.add('selected');
+
+            const deliveryCharge = 40;
+            const total = cartTotal + deliveryCharge;
+
+            if (method === 'wallet') {
+                document.getElementById('walletBalance').classList.add('show');
+                
+                if (walletBalance < total) {
+                    document.getElementById('insufficientBalance').classList.add('show');
+                    document.getElementById('confirmBtn').disabled = true;
+                    document.getElementById('confirmBtn').style.opacity = '0.5';
+                } else {
+                    document.getElementById('insufficientBalance').classList.remove('show');
+                    document.getElementById('confirmBtn').disabled = false;
+                    document.getElementById('confirmBtn').style.opacity = '1';
+                }
+            } else {
+                document.getElementById('walletBalance').classList.remove('show');
+                document.getElementById('insufficientBalance').classList.remove('show');
+                document.getElementById('confirmBtn').disabled = false;
+                document.getElementById('confirmBtn').style.opacity = '1';
+            }
+        }
+
+        function confirmPayment() {
+            if (!selectedPaymentMethod) {
+                showNotification("Please select a payment method", "error");
+                return;
+            }
+
+            const deliveryCharge = 40;
+            const total = cartTotal + deliveryCharge;
+
+            if (selectedPaymentMethod === 'wallet') {
+                // Pay with wallet
+                fetch('/api/wallet/pay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: total,
+                        description: 'Shopping Order Payment'
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`✅ Order placed successfully! Paid ₹${total.toFixed(2)} from wallet`, "success");
+                        localStorage.removeItem("cart");
+                        closePaymentModal();
+                        
+                        setTimeout(() => {
+                            window.location.href = '/home';
+                        }, 2000);
+                    } else {
+                        showNotification(data.error || 'Payment failed', "error");
+                    }
+                })
+                .catch(err => {
+                    showNotification("Error processing payment", "error");
+                });
+            } else {
+                // Cash on Delivery
+                showNotification(`✅ Order placed successfully! Total: ₹${total.toFixed(2)} (COD)`, "success");
+                localStorage.removeItem("cart");
+                closePaymentModal();
+                
+                setTimeout(() => {
+                    window.location.href = '/home';
+                }, 2000);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notificationMessage');
+            
+            notification.className = `notification ${type} show`;
+            messageEl.textContent = message;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
         loadCart();
-      }
-
-      function removeItem(index) {
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        cart.splice(index, 1);
-
-        localStorage.setItem("cart", JSON.stringify(cart));
-        loadCart();
-      }
-
-      function showCheckoutForm() {
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        if (cart.length === 0) {
-          alert("Your cart is empty!");
-          return;
-        }
-        document.getElementById("checkoutForm").style.display = "block";
-      }
-
-      function checkout() {
-        const email = document.getElementById("email").value.trim();
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-
-        // Email validation regex
-
-        const nameRegex = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
-        if (!nameRegex.test(name)) {
-          alert("❌ Enter a valid Full Name (No digits, No extra spaces)");
-          return false;
-        }
-
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
-        if (!emailRegex.test(email)) {
-          alert("❌ Enter a valid email!");
-          return false;
-        }
-
-        const phoneRegex = /^[6-9]\d{9}$/;
-        if (!phoneRegex.test(phone)) {
-          alert(
-            "❌ Enter a valid 10-digit Phone Number starting with 6, 7, 8, or 9"
-          );
-          return false;
-        }
-
-        alert("Order Placed Successfully! ");
-      }
-
-      loadCart();
     </script>
-  </body>
+</body>
 </html>

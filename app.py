@@ -6,29 +6,38 @@ from flask import redirect, url_for
 from datetime import datetime
 import random
 from twilio.rest import Client
+import os
+from dotenv import load_dotenv
 
-
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = os.getenv('SECRET_KEY')
+
+# Security Configuration
+app.secret_key = os.getenv('SECRET_KEY', os.urandom(32))
+app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to session cookie
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
+app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes session timeout
 
 # MySQL CONNECTION
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="***REMOVED_DB_PASSWORD***",   
-    database="smartshopping"
+    host=os.getenv('DB_HOST', 'localhost'),
+    user=os.getenv('DB_USER', 'root'),
+    password=os.getenv('DB_PASSWORD'),
+    database=os.getenv('DB_NAME', 'smartshopping')
 )
 
 cursor = db.cursor(dictionary=True)
 
 # TWILIO CONFIG
-ACCOUNT_SID = "***REMOVED_TWILIO_SID***"
-AUTH_TOKEN = "***REMOVED_TWILIO_TOKEN***"
-TWILIO_PHONE = "***REMOVED_PHONE***"
+ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE = os.getenv('TWILIO_PHONE')
 
-client = Client(ACCOUNT_SID, AUTH_TOKEN)
+client = Client(ACCOUNT_SID, AUTH_TOKEN) if ACCOUNT_SID and AUTH_TOKEN else None
 
 # CREATE TABLES
 def create_tables():
@@ -73,15 +82,14 @@ def create_tables():
         )
     """)
 
-    # CREDIT CARDS TABLE
+    # CREDIT CARDS TABLE - Note: Card numbers are masked, CVV is NOT stored
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS credit_cards (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT,
-            card_number VARCHAR(16),
+            card_number_last4 VARCHAR(4),
             card_holder_name VARCHAR(100),
             expiry_date VARCHAR(7),
-            cvv VARCHAR(3),
             card_type VARCHAR(20),
             is_default BOOLEAN DEFAULT FALSE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -228,20 +236,34 @@ def send_otp():
         flash("Phone number required")
         return redirect(url_for("index"))
 
+    # Rate limiting check (basic implementation)
+    if 'last_otp_time' in session:
+        from datetime import datetime, timedelta
+        last_time = datetime.fromisoformat(session['last_otp_time'])
+        if datetime.now() - last_time < timedelta(seconds=60):
+            flash("Please wait 60 seconds before requesting another OTP")
+            return redirect(url_for("index"))
+
     otp = random.randint(100000, 999999)
     session["otp"] = str(otp)
     session["phone"] = phone
+    session["last_otp_time"] = datetime.now().isoformat()
 
-    try:
-        client.messages.create(
-            body=f"Your OTP for Smart Shopping System is {otp}",
-            from_=TWILIO_PHONE,
-            to=phone
-        )
-        flash("OTP sent successfully")
-    except Exception as e:
-        flash("Failed to send OTP")
-        print(e)
+    if client:  # Only send if Twilio is configured
+        try:
+            client.messages.create(
+                body=f"Your OTP for Smart Shopping System is {otp}",
+                from_=TWILIO_PHONE,
+                to=phone
+            )
+            flash("OTP sent successfully")
+        except Exception as e:
+            flash("Failed to send OTP")
+            print(f"Twilio error: {e}")
+    else:
+        # For development without Twilio
+        print(f"Development mode - OTP: {otp}")
+        flash("OTP sent (check console in development mode)")
 
     return redirect(url_for("index"))
 
@@ -517,9 +539,9 @@ def get_cards():
     cursor.execute("SELECT * FROM credit_cards WHERE user_id=%s ORDER BY is_default DESC", (user_id,))
     cards = cursor.fetchall()
     
-    # Mask card numbers
+    # Format card display (already only storing last 4 digits)
     for card in cards:
-        card['card_number'] = '**** **** **** ' + card['card_number'][-4:]
+        card['card_number'] = '**** **** **** ' + card.get('card_number_last4', '****')
     
     return jsonify(cards)
 
@@ -530,10 +552,14 @@ def add_card():
         return jsonify({"error": "Not logged in"}), 401
 
     data = request.json
-    card_number = data.get('card_number').replace(' ', '')
+    card_number = data.get('card_number', '').replace(' ', '')
     card_holder = data.get('card_holder_name')
     expiry = data.get('expiry_date')
-    cvv = data.get('cvv')
+    # Note: CVV is NOT stored for security reasons
+    
+    # Basic validation
+    if len(card_number) < 13 or len(card_number) > 19:
+        return jsonify({"error": "Invalid card number"}), 400
     
     # Determine card type
     card_type = "Unknown"
@@ -544,10 +570,13 @@ def add_card():
     elif card_number.startswith('3'):
         card_type = "Amex"
 
+    # Only store last 4 digits for security
+    last4 = card_number[-4:]
+
     cursor.execute("""
-        INSERT INTO credit_cards (user_id, card_number, card_holder_name, expiry_date, cvv, card_type)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """, (user_id, card_number, card_holder, expiry, cvv, card_type))
+        INSERT INTO credit_cards (user_id, card_number_last4, card_holder_name, expiry_date, card_type)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (user_id, last4, card_holder, expiry, card_type))
     
     db.commit()
 
@@ -594,5 +623,13 @@ def get_transactions():
 if __name__ == '__main__':
     create_tables()
     seed_products()
+    
+    # Get environment settings
+    flask_env = os.getenv('FLASK_ENV', 'production')
+    debug_mode = flask_env == 'development'
+    
+    if debug_mode:
+        print("⚠️  Running in DEVELOPMENT mode")
     print("🚀 Flask running on http://127.0.0.1:5000/")
-    app.run(debug=True)
+    
+    app.run(debug=debug_mode, host='127.0.0.1')

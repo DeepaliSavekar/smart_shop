@@ -8,6 +8,7 @@ import random
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
+from contextlib import contextmanager
 
 # Load environment variables
 load_dotenv()
@@ -22,15 +23,24 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to ses
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes session timeout
 
-# MySQL CONNECTION
-db = mysql.connector.connect(
-    host=os.getenv('DB_HOST', 'localhost'),
-    user=os.getenv('DB_USER', 'root'),
-    password=os.getenv('DB_PASSWORD'),
-    database=os.getenv('DB_NAME', 'smartshopping')
-)
+# MySQL CONNECTION HELPER
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST', 'localhost'),
+        user=os.getenv('DB_USER', 'root'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME', 'smartshopping')
+    )
 
-cursor = db.cursor(dictionary=True)
+@contextmanager
+def get_db():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        yield conn, cursor
+    finally:
+        cursor.close()
+        conn.close()
 
 # TWILIO CONFIG
 ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
@@ -41,128 +51,129 @@ client = Client(ACCOUNT_SID, AUTH_TOKEN) if ACCOUNT_SID and AUTH_TOKEN else None
 
 # CREATE TABLES
 def create_tables():
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100),
-            email VARCHAR(100) UNIQUE,
-            phone VARCHAR(15),
-            password VARCHAR(255)
-        )
-    """)
+    with get_db() as (conn, cursor):
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100),
+                email VARCHAR(100) UNIQUE,
+                phone VARCHAR(15),
+                password VARCHAR(255)
+            )
+        """)
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255),
-            price INT,
-            img VARCHAR(255),
-            category VARCHAR(50)
-        )
-    """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                price INT,
+                img VARCHAR(255),
+                category VARCHAR(50)
+            )
+        """)
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS cart (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255),
-            price INT,
-            img VARCHAR(255),
-            quantity INT DEFAULT 1
-        )
-    """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS cart (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                price INT,
+                img VARCHAR(255),
+                quantity INT DEFAULT 1
+            )
+        """)
 
-    # E-WALLET TABLE
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS wallet (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT UNIQUE,
-            balance DECIMAL(10, 2) DEFAULT 0.00,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
+        # E-WALLET TABLE
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS wallet (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT UNIQUE,
+                balance DECIMAL(10, 2) DEFAULT 0.00,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
 
-    # CREDIT CARDS TABLE - Note: Card numbers are masked, CVV is NOT stored
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS credit_cards (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            card_number_last4 VARCHAR(4),
-            card_holder_name VARCHAR(100),
-            expiry_date VARCHAR(7),
-            card_type VARCHAR(20),
-            is_default BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
+        # CREDIT CARDS TABLE
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS credit_cards (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                card_number_last4 VARCHAR(4),
+                card_holder_name VARCHAR(100),
+                expiry_date VARCHAR(7),
+                card_type VARCHAR(20),
+                is_default BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
 
-    # TRANSACTIONS TABLE
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS transactions (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            transaction_type ENUM('credit', 'debit', 'deposit') NOT NULL,
-            amount DECIMAL(10, 2) NOT NULL,
-            description VARCHAR(255),
-            payment_method VARCHAR(50),
-            status ENUM('success', 'failed', 'pending') DEFAULT 'success',
-            balance_after DECIMAL(10, 2),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
+        # TRANSACTIONS TABLE
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                transaction_type ENUM('credit', 'debit', 'deposit') NOT NULL,
+                amount DECIMAL(10, 2) NOT NULL,
+                description VARCHAR(255),
+                payment_method VARCHAR(50),
+                status ENUM('success', 'failed', 'pending') DEFAULT 'success',
+                balance_after DECIMAL(10, 2),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
 
-    # ORDERS TABLE
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS orders (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            total_amount DECIMAL(10, 2),
-            payment_method VARCHAR(50),
-            order_status VARCHAR(50) DEFAULT 'Processing',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-
-    db.commit()
+        # ORDERS TABLE
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                total_amount DECIMAL(10, 2),
+                payment_method VARCHAR(50),
+                order_status VARCHAR(50) DEFAULT 'Processing',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+        conn.commit()
 
 # SEED PRODUCTS
 def seed_products():
-    cursor.execute("SELECT COUNT(*) AS total FROM products")
-    count = cursor.fetchone()['total']
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT COUNT(*) AS total FROM products")
+        count = cursor.fetchone()['total']
 
-    if count == 0:
-        products_list = [
-            ("Pampers Diapers (Pack of 40)", 650, "/images/diapers.png", "baby"),
-            ("Baby Lotion (Himalaya, 200ml)", 180, "/images/babylotion.jpg", "baby"),
-            ("Baby Shampoo (Johnson's, 100ml)", 120, "/images/babyshampoo.jpg", "baby"),
-            ("Baby Soap (Dove, 4 pcs)", 150, "/images/babysoap.jpg", "baby"),
-            ("Baby Powder (Johnson's, 200g)", 160, "/images/babypowder.jpg", "baby"),
-            ("Baby Oil (Johnson's, 200ml)", 140, "/images/babyoil.jpg", "baby"),
-            ("Feeding Bottle (Philips Avent, 250ml)", 499, "/images/feeding-bottle.jpg", "baby"),
-            ("Baby Toothbrush (Pigeon Soft Grip)", 120, "/images/brush.jpg", "baby"),
-            ("Baby Cream (Himalaya, 50g)", 90, "/images/babycream.jpg", "baby"),
-            ("Baby Cloth Set", 400, "/images/babycloth.jpg", "baby"),
-            ("Lipstick (Lakme, 4g)", 350, "/images/lipstick.jpg", "beauty"),
-            ("Eyeliner (Maybelline, 3ml)", 220, "/images/eyeliner.jpg", "beauty"),
-            ("Foundation (L'Oréal, 30ml)", 450, "/images/foundation.jpg", "beauty"),
-            ("Compact Powder (Lakme, 9g)", 250, "/images/compact.jpg", "beauty"),
-            ("Nail Polish (Colorbar, 6ml)", 180, "/images/nailpolish.jpg", "beauty"),
-            ("Makeup Brush Set", 300, "/images/brushset.jpg", "beauty"),
-            ("Perfume (Fogg, 100ml)", 320, "/images/perfume.jpg", "beauty"),
-            ("Face Mask (Sheet, Pack of 3)", 150, "/images/facemask.jpg", "beauty"),
-            ("Makeup Remover (Garnier, 125ml)", 190, "/images/remover.jpg", "beauty"),
-            ("Kajal (Himalaya, 1.2g)", 120, "/images/kajal.jpg", "beauty")
-        ]
+        if count == 0:
+            products_list = [
+                ("Pampers Diapers (Pack of 40)", 650, "/images/diapers.png", "baby"),
+                ("Baby Lotion (Himalaya, 200ml)", 180, "/images/babylotion.jpg", "baby"),
+                ("Baby Shampoo (Johnson's, 100ml)", 120, "/images/babyshampoo.jpg", "baby"),
+                ("Baby Soap (Dove, 4 pcs)", 150, "/images/babysoap.jpg", "baby"),
+                ("Baby Powder (Johnson's, 200g)", 160, "/images/babypowder.jpg", "baby"),
+                ("Baby Oil (Johnson's, 200ml)", 140, "/images/babyoil.jpg", "baby"),
+                ("Feeding Bottle (Philips Avent, 250ml)", 499, "/images/feeding-bottle.jpg", "baby"),
+                ("Baby Toothbrush (Pigeon Soft Grip)", 120, "/images/brush.jpg", "baby"),
+                ("Baby Cream (Himalaya, 50g)", 90, "/images/babycream.jpg", "baby"),
+                ("Baby Cloth Set", 400, "/images/babycloth.jpg", "baby"),
+                ("Lipstick (Lakme, 4g)", 350, "/images/lipstick.jpg", "beauty"),
+                ("Eyeliner (Maybelline, 3ml)", 220, "/images/eyeliner.jpg", "beauty"),
+                ("Foundation (L'Oréal, 30ml)", 450, "/images/foundation.jpg", "beauty"),
+                ("Compact Powder (Lakme, 9g)", 250, "/images/compact.jpg", "beauty"),
+                ("Nail Polish (Colorbar, 6ml)", 180, "/images/nailpolish.jpg", "beauty"),
+                ("Makeup Brush Set", 300, "/images/brushset.jpg", "beauty"),
+                ("Perfume (Fogg, 100ml)", 320, "/images/perfume.jpg", "beauty"),
+                ("Face Mask (Sheet, Pack of 3)", 150, "/images/facemask.jpg", "beauty"),
+                ("Makeup Remover (Garnier, 125ml)", 190, "/images/remover.jpg", "beauty"),
+                ("Kajal (Himalaya, 1.2g)", 120, "/images/kajal.jpg", "beauty")
+            ]
 
-        cursor.executemany("""
-            INSERT INTO products (name, price, img, category)
-            VALUES (%s, %s, %s, %s)
-        """, products_list)
-        db.commit()
-        print("✅ Products inserted successfully!")
+            cursor.executemany("""
+                INSERT INTO products (name, price, img, category)
+                VALUES (%s, %s, %s, %s)
+            """, products_list)
+            conn.commit()
+            print("✅ Products inserted successfully!")
 
 # ========== BASIC ROUTES ==========
 
@@ -185,21 +196,21 @@ def register():
         if not name or not email or not password:
             return "All fields are required!", 400
 
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        if cursor.fetchone():
-            return "Email already registered!", 400
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+            if cursor.fetchone():
+                return "Email already registered!", 400
 
-        hashed_password = generate_password_hash(password)
-        cursor.execute(
-            "INSERT INTO users (name, email, phone, password) VALUES (%s, %s, %s, %s)",
-            (name, email, phone, hashed_password)
-        )
-        db.commit()
-        
-        # Create wallet for new user
-        user_id = cursor.lastrowid
-        cursor.execute("INSERT INTO wallet (user_id, balance) VALUES (%s, 0.00)", (user_id,))
-        db.commit()
+            hashed_password = generate_password_hash(password)
+            cursor.execute(
+                "INSERT INTO users (name, email, phone, password) VALUES (%s, %s, %s, %s)",
+                (name, email, phone, hashed_password)
+            )
+            
+            # Create wallet for new user
+            user_id = cursor.lastrowid
+            cursor.execute("INSERT INTO wallet (user_id, balance) VALUES (%s, 0.00)", (user_id,))
+            conn.commit()
 
         return redirect("/login")
 
@@ -211,8 +222,9 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
+        with get_db() as (conn, cursor):
+            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+            user = cursor.fetchone()
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
@@ -382,8 +394,9 @@ def fresh_vegetables():
 
 @app.route('/api/products/<category_name>', methods=['GET'])
 def get_products(category_name):
-    cursor.execute("SELECT * FROM products WHERE category=%s", (category_name,))
-    products = cursor.fetchall()
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM products WHERE category=%s", (category_name,))
+        products = cursor.fetchall()
     return jsonify(products)
 
 @app.route('/api/cart/add', methods=['POST'])
@@ -391,27 +404,29 @@ def add_to_cart():
     data = request.json
     name = data['name']
 
-    cursor.execute("SELECT * FROM cart WHERE name=%s", (name,))
-    existing = cursor.fetchone()
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM cart WHERE name=%s", (name,))
+        existing = cursor.fetchone()
 
-    if existing:
-        cursor.execute(
-            "UPDATE cart SET quantity = quantity + 1 WHERE name=%s",
-            (name,)
-        )
-    else:
-        cursor.execute(
-            "INSERT INTO cart (name, price, img, quantity) VALUES (%s, %s, %s, 1)",
-            (data['name'], data['price'], data['img'])
-        )
-
-    db.commit()
+        if existing:
+            cursor.execute(
+                "UPDATE cart SET quantity = quantity + 1 WHERE name=%s",
+                (name,)
+            )
+        else:
+            cursor.execute(
+                "INSERT INTO cart (name, price, img, quantity) VALUES (%s, %s, %s, 1)",
+                (data['name'], data['price'], data['img'])
+            )
+        conn.commit()
+        
     return jsonify({"message": "Item added/updated"})
 
 @app.route('/api/cart', methods=['GET'])
 def get_cart():
-    cursor.execute("SELECT * FROM cart")
-    items = cursor.fetchall()
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM cart")
+        items = cursor.fetchall()
     return jsonify(items)
 
 @app.route('/api/cart/update/<int:item_id>', methods=['PUT'])
@@ -419,19 +434,21 @@ def update_cart(item_id):
     data = request.json
     change = data['change']
 
-    cursor.execute("UPDATE cart SET quantity = quantity + %s WHERE id=%s",
-                   (change, item_id))
-    db.commit()
+    with get_db() as (conn, cursor):
+        cursor.execute("UPDATE cart SET quantity = quantity + %s WHERE id=%s",
+                       (change, item_id))
+        conn.commit() # Important for transaction integrity
 
-    cursor.execute("DELETE FROM cart WHERE quantity <= 0")
-    db.commit()
+        cursor.execute("DELETE FROM cart WHERE quantity <= 0")
+        conn.commit()
 
     return jsonify({"message": "Cart updated"})
 
 @app.route('/api/cart/<int:item_id>', methods=['DELETE'])
 def remove_item(item_id):
-    cursor.execute("DELETE FROM cart WHERE id=%s", (item_id,))
-    db.commit()
+    with get_db() as (conn, cursor):
+        cursor.execute("DELETE FROM cart WHERE id=%s", (item_id,))
+        conn.commit()
     return jsonify({"message": "Item removed"})
 
 # ========== E-WALLET API ==========
@@ -442,8 +459,9 @@ def get_wallet_balance():
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
 
-    cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
-    wallet = cursor.fetchone()
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
+        wallet = cursor.fetchone()
     
     if wallet:
         return jsonify({"balance": float(wallet['balance'])})
@@ -462,22 +480,27 @@ def deposit_to_wallet():
     if amount <= 0:
         return jsonify({"error": "Invalid amount"}), 400
 
-    # Get current balance
-    cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
-    wallet = cursor.fetchone()
-    current_balance = float(wallet['balance']) if wallet else 0.00
-    new_balance = current_balance + amount
-
-    # Update wallet balance
-    cursor.execute("UPDATE wallet SET balance=%s WHERE user_id=%s", (new_balance, user_id))
-    
-    # Record transaction
-    cursor.execute("""
-        INSERT INTO transactions (user_id, transaction_type, amount, description, payment_method, balance_after)
-        VALUES (%s, 'deposit', %s, %s, %s, %s)
-    """, (user_id, amount, f"Deposit to wallet", "Credit Card", new_balance))
-    
-    db.commit()
+    with get_db() as (conn, cursor):
+        # Get current balance
+        cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
+        wallet = cursor.fetchone()
+        
+        if wallet:
+            current_balance = float(wallet['balance'])
+            new_balance = current_balance + amount
+            cursor.execute("UPDATE wallet SET balance=%s WHERE user_id=%s", (new_balance, user_id))
+        else:
+            current_balance = 0.00
+            new_balance = amount
+            cursor.execute("INSERT INTO wallet (user_id, balance) VALUES (%s, %s)", (user_id, new_balance))
+        
+        # Record transaction
+        cursor.execute("""
+            INSERT INTO transactions (user_id, transaction_type, amount, description, payment_method, balance_after)
+            VALUES (%s, 'deposit', %s, %s, %s, %s)
+        """, (user_id, amount, f"Deposit to wallet", "Credit Card", new_balance))
+        
+        conn.commit()
 
     return jsonify({
         "success": True,
@@ -495,32 +518,33 @@ def pay_from_wallet():
     amount = float(data.get('amount', 0))
     description = data.get('description', 'Purchase')
 
-    # Check wallet balance
-    cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
-    wallet = cursor.fetchone()
-    current_balance = float(wallet['balance']) if wallet else 0.00
+    with get_db() as (conn, cursor):
+        # Check wallet balance
+        cursor.execute("SELECT balance FROM wallet WHERE user_id=%s", (user_id,))
+        wallet = cursor.fetchone()
+        current_balance = float(wallet['balance']) if wallet else 0.00
 
-    if current_balance < amount:
-        return jsonify({"error": "Insufficient balance", "current_balance": current_balance}), 400
+        if current_balance < amount:
+            return jsonify({"error": "Insufficient balance", "current_balance": current_balance}), 400
 
-    new_balance = current_balance - amount
+        new_balance = current_balance - amount
 
-    # Update wallet
-    cursor.execute("UPDATE wallet SET balance=%s WHERE user_id=%s", (new_balance, user_id))
-    
-    # Record transaction
-    cursor.execute("""
-        INSERT INTO transactions (user_id, transaction_type, amount, description, payment_method, balance_after)
-        VALUES (%s, 'debit', %s, %s, 'E-Wallet', %s)
-    """, (user_id, amount, description, new_balance))
-    
-    # Create order
-    cursor.execute("""
-        INSERT INTO orders (user_id, total_amount, payment_method)
-        VALUES (%s, %s, 'E-Wallet')
-    """, (user_id, amount))
-    
-    db.commit()
+        # Update wallet
+        cursor.execute("UPDATE wallet SET balance=%s WHERE user_id=%s", (new_balance, user_id))
+        
+        # Record transaction
+        cursor.execute("""
+            INSERT INTO transactions (user_id, transaction_type, amount, description, payment_method, balance_after)
+            VALUES (%s, 'debit', %s, %s, 'E-Wallet', %s)
+        """, (user_id, amount, description, new_balance))
+        
+        # Create order
+        cursor.execute("""
+            INSERT INTO orders (user_id, total_amount, payment_method)
+            VALUES (%s, %s, 'E-Wallet')
+        """, (user_id, amount))
+        
+        conn.commit()
 
     return jsonify({
         "success": True,
@@ -536,10 +560,11 @@ def get_cards():
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
 
-    cursor.execute("SELECT * FROM credit_cards WHERE user_id=%s ORDER BY is_default DESC", (user_id,))
-    cards = cursor.fetchall()
+    with get_db() as (conn, cursor):
+        cursor.execute("SELECT * FROM credit_cards WHERE user_id=%s ORDER BY is_default DESC", (user_id,))
+        cards = cursor.fetchall()
     
-    # Format card display (already only storing last 4 digits)
+    # Format card display
     for card in cards:
         card['card_number'] = '**** **** **** ' + card.get('card_number_last4', '****')
     
@@ -555,7 +580,6 @@ def add_card():
     card_number = data.get('card_number', '').replace(' ', '')
     card_holder = data.get('card_holder_name')
     expiry = data.get('expiry_date')
-    # Note: CVV is NOT stored for security reasons
     
     # Basic validation
     if len(card_number) < 13 or len(card_number) > 19:
@@ -573,12 +597,12 @@ def add_card():
     # Only store last 4 digits for security
     last4 = card_number[-4:]
 
-    cursor.execute("""
-        INSERT INTO credit_cards (user_id, card_number_last4, card_holder_name, expiry_date, card_type)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (user_id, last4, card_holder, expiry, card_type))
-    
-    db.commit()
+    with get_db() as (conn, cursor):
+        cursor.execute("""
+            INSERT INTO credit_cards (user_id, card_number_last4, card_holder_name, expiry_date, card_type)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, last4, card_holder, expiry, card_type))
+        conn.commit()
 
     return jsonify({"success": True, "message": "Card added successfully"})
 
@@ -588,8 +612,9 @@ def delete_card(card_id):
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
 
-    cursor.execute("DELETE FROM credit_cards WHERE id=%s AND user_id=%s", (card_id, user_id))
-    db.commit()
+    with get_db() as (conn, cursor):
+        cursor.execute("DELETE FROM credit_cards WHERE id=%s AND user_id=%s", (card_id, user_id))
+        conn.commit()
 
     return jsonify({"success": True, "message": "Card deleted"})
 
@@ -601,14 +626,15 @@ def get_transactions():
     if not user_id:
         return jsonify({"error": "Not logged in"}), 401
 
-    cursor.execute("""
-        SELECT * FROM transactions 
-        WHERE user_id=%s 
-        ORDER BY created_at DESC 
-        LIMIT 50
-    """, (user_id,))
-    
-    transactions = cursor.fetchall()
+    with get_db() as (conn, cursor):
+        cursor.execute("""
+            SELECT * FROM transactions 
+            WHERE user_id=%s 
+            ORDER BY created_at DESC 
+            LIMIT 50
+        """, (user_id,))
+        
+        transactions = cursor.fetchall()
     
     # Format dates
     for txn in transactions:

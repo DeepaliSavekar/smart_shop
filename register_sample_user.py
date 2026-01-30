@@ -22,10 +22,10 @@ def register_user():
         cursor = db.cursor(dictionary=True)
         
         # User details
-        email = "abc@123"
-        password = "Abc@123"
-        name = "Sample User"  # Placeholder as it wasn't specified
-        phone = "1234567890"  # Placeholder as it wasn't specified
+        email = "sample@example.com"
+        password = "Password@123"
+        name = "Demo User"
+        phone = "9876543210"
 
         # Check if user already exists
         print(f"Checking if user '{email}' exists...")
